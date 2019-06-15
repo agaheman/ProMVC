@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using ProMVC.WebFramework.Models;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -10,12 +12,14 @@ namespace ProMVC.WebFramework.Middlewares
     public class IPBlackListMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly List<string> ipList;
+        private readonly IPListConfiguration iPListConfiguration;
+        private readonly IEnumerable<IPAddress> blockedIPs;
 
-        public IPBlackListMiddleware(RequestDelegate next,List<string> ipList)
+        public IPBlackListMiddleware(RequestDelegate next,IPListConfiguration iPListConfiguration)
         {
             _next = next;
-            this.ipList = ipList;
+
+            this.blockedIPs = iPListConfiguration.BlockedIPs.Select(item => IPAddress.Parse(item));
         }
 
         public async Task Invoke(HttpContext httpContext)
@@ -24,7 +28,7 @@ namespace ProMVC.WebFramework.Middlewares
 
             //var remoteIpBytes = remoteIp.GetAddressBytes();
 
-            if (ipList.Contains(remoteIp.ToString()))
+            if (blockedIPs.Contains(remoteIp))
             {
                 httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                 return;
