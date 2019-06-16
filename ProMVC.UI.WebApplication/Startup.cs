@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using ProMVC.WebFramework.Middlewares;
 using ProMVC.WebFramework.Models;
 
 namespace ProMVC.UI.WebApplication
@@ -51,8 +52,8 @@ namespace ProMVC.UI.WebApplication
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseCustomExceptionHandlerMiddleware();
+                //app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
 
@@ -60,12 +61,7 @@ namespace ProMVC.UI.WebApplication
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseMvcWithDefaultRoute();
         }
     }
 }
